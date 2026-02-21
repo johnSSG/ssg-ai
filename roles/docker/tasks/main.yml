@@ -1,0 +1,23 @@
+---
+- name: Install Docker + Cockpit + NVIDIA toolkit
+  ansible.builtin.apt:
+    name:
+      - python3-docker
+      - python3-compose
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+      - nvidia-container-toolkit
+    state: present
+
+- name: Configure NVIDIA runtime
+  ansible.builtin.command: nvidia-ctk runtime configure --runtime=docker
+  args:
+    creates: /etc/docker/daemon.json
+  notify: Restart Docker
+
+- name: Ensure Docker enabled
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true

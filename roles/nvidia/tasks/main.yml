@@ -1,0 +1,14 @@
+---
+- name: Install NVIDIA 590 open driver
+  ansible.builtin.apt:
+    name:
+      - linux-modules-nvidia-590-open-oem-24.04d
+      - nvidia-utils-590
+      - libnvidia-compute-590
+    state: present
+  register: nvidia_driver
+
+- name: Reboot for NVIDIA driver
+  ansible.builtin.reboot:
+    reboot_timeout: 600
+  when: nvidia_driver.changed

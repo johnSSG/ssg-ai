@@ -1,0 +1,54 @@
+---
+- name: Remove old repo files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/docker.list
+    - /etc/apt/sources.list.d/docker.sources
+    - /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+- name: Add Docker repo (amd64 only)
+  block:
+    - ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+    - ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/docker.sources
+        content: |
+          Types: deb
+          URIs: https://download.docker.com/linux/ubuntu
+          Suites: noble
+          Components: stable
+          Signed-By: /etc/apt/keyrings/docker.asc
+          Architectures: amd64
+        mode: '0644'
+
+
+- name: Check for existing GPG keyring
+  ansible.builtin.stat: 
+    path: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  register: gpg_keyring
+
+- name: Add NVIDIA Container Toolkit GPG + repo
+  ansible.builtin.shell: |
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
+  when: not gpg_keyring.stat.exists
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install SSH
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+
+- name: Allow required ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: [22, 80, 443, 445]

@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: yourname
+  description: Common server setup
+  platforms:
+    - name: Ubuntu
+      versions: [noble]

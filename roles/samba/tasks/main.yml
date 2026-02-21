@@ -1,0 +1,43 @@
+---
+- name: Install packages
+  ansible.builtin.apt:
+    name: 
+      - samba
+      - cockpit
+    state: present
+    
+- name: Create webusers group
+  ansible.builtin.group:
+    name: "{{ web_group }}"
+    state: present
+
+- name: Ensure /var/www directory with correct permissions
+  ansible.builtin.file:
+    path: "{{ samba_share_path }}"
+    state: directory
+    owner: www-data
+    group: "{{ web_group }}"
+    mode: '2775'
+    recurse: yes
+
+- name: Configure Samba share for /var/www
+  ansible.builtin.blockinfile:
+    path: /etc/samba/smb.conf
+    marker: "# {mark} ANSIBLE MANAGED WEB ROOT"
+    block: |
+      [www]
+      path = {{ samba_share_path }}
+      browseable = yes
+      writable = yes
+      guest ok = no
+      read only = no
+      create mask = 0664
+      directory mask = 0775
+      force group = {{ web_group }}
+      valid users = @{{ web_group }}
+  notify: Restart Samba
+
+- name: Ensure Samba enabled
+  ansible.builtin.systemd:
+    name: smbd
+    enabled: true

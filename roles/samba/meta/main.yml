@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: yourname
+  description: samba role
+  platforms:
+    - name: Ubuntu
+      versions: [noble]

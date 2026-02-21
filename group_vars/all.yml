@@ -1,0 +1,15 @@
+---
+# === Domains ===
+domain_main: getsimplicity.dev
+domain_ai:   ai.getsimplicity.dev
+domain_api:  api.getsimplicity.dev
+
+# === Let's Encrypt ===
+le_email: tech@simplicity.online
+
+# === Samba ===
+web_group: webusers
+samba_share_path: /var/www
+
+# === LAMP ===
+mariadb_root_password: "CHANGE_ME_BEFORE_FIRST_RUN"

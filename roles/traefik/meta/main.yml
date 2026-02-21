@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: yourname
+  description: traefik role
+  platforms:
+    - name: Ubuntu
+      versions: [noble]

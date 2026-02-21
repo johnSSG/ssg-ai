@@ -1,0 +1,12 @@
+---
+- name: Full AI + LAMP + Traefik + Samba server
+  hosts: localhost
+  become: true
+  roles:
+    - common
+    - nvidia
+    - docker
+    - samba
+    - traefik
+    - ai
+    - lamp

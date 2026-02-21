@@ -1,0 +1,11 @@
+---
+- name: Ensure LAMP directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /var/www/html
+    - /opt/ai-stack/lamp/db
+    - /opt/ai-stack/lamp/sites-enabled
+    - /opt/ai-stack/lamp/htpasswd
