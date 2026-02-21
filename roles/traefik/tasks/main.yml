@@ -83,6 +83,7 @@
             - /var/www:/var/www
             - /opt/ai-stack/lamp/htpasswd:/htpasswd
             - /opt/ai-stack/lamp/sites-enabled:/etc/apache2/sites-enabled
+            - /opt/ai-stack/lamp/rewrite.load:/etc/apache2/mods-enabled/rewrite.load:ro
           labels:
             - traefik.enable=true
             - traefik.http.routers.lamp.rule=Host(`{{ domain_main }}`)

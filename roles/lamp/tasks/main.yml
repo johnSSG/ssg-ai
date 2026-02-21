@@ -9,3 +9,10 @@
     - /opt/ai-stack/lamp/db
     - /opt/ai-stack/lamp/sites-enabled
     - /opt/ai-stack/lamp/htpasswd
+
+- name: Create mod_rewrite.load for Apache (idempotent)
+  ansible.builtin.copy:
+    dest: /opt/ai-stack/lamp/rewrite.load
+    mode: '0644'
+    content: |
+      LoadModule rewrite_module /usr/lib/apache2/modules/mod_rewrite.so

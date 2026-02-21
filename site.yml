@@ -10,3 +10,10 @@
     - traefik
     - ai
     - lamp
+
+  tasks:
+    - name: Force-recreate all containers after every playbook run
+      community.docker.docker_compose_v2:
+        project_src: /opt/ai-stack
+        state: present
+        recreate: always
