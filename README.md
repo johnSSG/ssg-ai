@@ -7,7 +7,6 @@ Self-hosted production stack on Ubuntu 24.04 with NVIDIA RTX 4000 Ada GPU accele
 - Traefik v3 → reverse proxy + automatic Let's Encrypt TLS
 - Ollama → local LLM inference (full GPU offload)
 - Open WebUI → ChatGPT-like interface at https://ai.getsimplicity.dev
-- OpenAI-compatible API at https://api.getsimplicity.dev (for your PHP agentic code)
 - LAMP → PHP 8.3 + Apache + MariaDB at https://getsimplicity.dev
 - Samba share → /var/www (edit files directly from Windows/Mac)
 - Cockpit → web server management[](https://your-server:9090)
@@ -26,7 +25,7 @@ git clone https://github.com/yourname/ai-bootstrap.git
 cd ai-bootstrap
 
 # Edit domains, email, and passwords
-nano group_vars/all.yml
+group_vars/all.yml
 
 # One-time collections
 ansible-galaxy collection install community.docker community.general --force
@@ -38,12 +37,12 @@ ansible-playbook -K -i inventory/localhost.yml site.yml
 
 - PHP files → /var/www/html/
 - Custom Apache .conf files → /opt/ai-stack/lamp/sites-available/
-- Samba share → \\your-server-ip\www (same SSH username/password)
+- Samba share → \\ai-server\www, \\ai-server\fileserver 
 
 ## Direct Access (server only)
 
-- Ollama raw API: http://localhost:11434
-- Cockpit: https://your-server:9090
+- Ollama raw API: http://ai-server:11434
+- Cockpit: https://ai-server:9090
 
 ## Secrets
 
