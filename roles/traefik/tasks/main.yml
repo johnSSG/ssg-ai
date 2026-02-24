@@ -64,17 +64,6 @@
             - traefik.http.routers.ai.tls.certresolver=letsencrypt
             - traefik.http.services.ai.loadbalancer.server.port=8080
 
-        openwebui-api:
-          image: ghcr.io/open-webui/open-webui:main
-          container_name: openwebui-api
-          restart: unless-stopped
-          labels:
-            - traefik.enable=true
-            - traefik.http.routers.api.rule=Host(`{{ domain_api }}`)
-            - traefik.http.routers.api.entrypoints=websecure
-            - traefik.http.routers.api.tls.certresolver=letsencrypt
-            - traefik.http.services.api.loadbalancer.server.port=8080
-
         lamp-web:
           image: php:8.3-apache
           container_name: lamp-web
@@ -83,7 +72,7 @@
             - /var/www:/var/www
             - /opt/ai-stack/lamp/htpasswd:/htpasswd
             - /opt/ai-stack/lamp/sites-enabled:/etc/apache2/sites-enabled
-            - /opt/ai-stack/lamp/rewrite.load:/etc/apache2/mods-enabled/rewrite.load:ro
+            - /opt/ai-stack/lamp/custom-modules.conf:/etc/apache2/conf-enabled/custom-modules.conf:ro
           labels:
             - traefik.enable=true
             - traefik.http.routers.lamp.rule=Host(`{{ domain_main }}`)
@@ -96,7 +85,17 @@
           container_name: lamp-db
           restart: unless-stopped
           environment:
-            MYSQL_ROOT_PASSWORD: "{{ mariadb_root_password }}"
-            MYSQL_DATABASE: simplicity
+            MARIADB_ROOT_PASSWORD: "{{ mariadb_root_password }}"
           volumes:
             - /opt/ai-stack/lamp/db:/var/lib/mysql
+
+        postgres:
+          image: postgres:16-alpine
+          container_name: postgres
+          restart: unless-stopped
+          ports:
+            - "5432:5432"
+          environment:
+            POSTGRES_PASSWORD: "{{ postgres_password }}"
+          volumes:
+            - /opt/ai-stack/lamp/postgres/data:/var/lib/postgresql/data

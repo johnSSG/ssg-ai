@@ -1,0 +1,33 @@
+[global]
+  dns proxy = No
+  log file = /var/log/samba/log.%m
+  map to guest = Bad User
+  max log size = 1000
+  obey pam restrictions = Yes
+  pam password change = Yes
+  panic action = /usr/share/samba/panic-action %d
+  passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+  passwd program = /usr/bin/passwd %u
+  server role = standalone server
+  server string = %h server (Samba, Ubuntu)
+  syslog = 0
+  unix password sync = Yes
+  usershare allow guests = Yes
+  usershare owner only = No
+  idmap config * : backend = tdb
+[www]
+  create mask = 0664
+  directory mask = 0775
+  force group = samba_share
+  force user = www-data
+  guest ok = Yes
+  path = /var/www
+  read only = No
+[fileserver]
+  create mask = 0664
+  directory mask = 0775
+  force group = samba_share
+  force user = root
+  guest ok = Yes
+  path = /srv/fileserver
+  read only = No

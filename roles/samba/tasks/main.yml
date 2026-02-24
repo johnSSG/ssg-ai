@@ -6,35 +6,33 @@
       - cockpit
     state: present
     
-- name: Create webusers group
+- name: Create samba_share group
   ansible.builtin.group:
-    name: "{{ web_group }}"
+    name: "{{ share_group }}"
     state: present
 
-- name: Ensure /var/www directory with correct permissions
+- name: Ensure /srv/fileserver directory with correct permissions
   ansible.builtin.file:
-    path: "{{ samba_share_path }}"
+    path: "{{ samba_fileserver_share_path }}"
     state: directory
-    owner: www-data
-    group: "{{ web_group }}"
+    owner: root
+    group: "{{ share_group }}"
     mode: '2775'
     recurse: yes
 
-- name: Configure Samba share for /var/www
-  ansible.builtin.blockinfile:
-    path: /etc/samba/smb.conf
-    marker: "# {mark} ANSIBLE MANAGED WEB ROOT"
-    block: |
-      [www]
-      path = {{ samba_share_path }}
-      browseable = yes
-      writable = yes
-      guest ok = no
-      read only = no
-      create mask = 0664
-      directory mask = 0775
-      force group = {{ web_group }}
-      valid users = @{{ web_group }}
+- name: Ensure /var/www directory with correct permissions
+  ansible.builtin.file:
+    path: "{{ samba_www_share_path }}"
+    state: directory
+    owner: www-data
+    group: "{{ share_group }}"
+    mode: '2775'
+    recurse: yes
+
+- name: Configure Samba
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
   notify: Restart Samba
 
 - name: Ensure Samba enabled

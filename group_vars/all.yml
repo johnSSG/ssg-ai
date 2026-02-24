@@ -8,8 +8,11 @@ domain_api:  api.getsimplicity.dev
 le_email: tech@simplicity.online
 
 # === Samba ===
-web_group: webusers
-samba_share_path: /var/www
+share_group: samba_share
+samba_www_share_path: /var/www
+samba_fileserver_share_path: /srv/fileserver
 
 # === LAMP ===
 mariadb_root_password: "CHANGE_ME_BEFORE_FIRST_RUN"
+postgres_password: "CHANGE_ME_BEFORE_FIRST_RUN"
+
