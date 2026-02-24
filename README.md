@@ -7,7 +7,7 @@ Self-hosted production stack on Ubuntu 24.04 with NVIDIA RTX 4000 Ada GPU accele
 - Traefik v3 → reverse proxy + automatic Let's Encrypt TLS
 - Ollama → local LLM inference (full GPU offload)
 - Open WebUI → ChatGPT-like interface at https://ai.getsimplicity.dev
-- LAMP → PHP 8.3 + Apache + MariaDB at https://getsimplicity.dev
+- LAMP → PHP 8.1 + Apache + MariaDB at https://getsimplicity.dev
 - Samba share → /var/www (edit files directly from Windows/Mac)
 - Cockpit → web server management[](https://your-server:9090)
 
