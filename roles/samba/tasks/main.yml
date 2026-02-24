@@ -30,8 +30,8 @@
     recurse: yes
 
 - name: Configure Samba
-  ansible.builtin.template:
-    src: smb.conf.j2
+  ansible.builtin.copy:
+    src: smb.conf
     dest: /etc/samba/smb.conf
   notify: Restart Samba
 

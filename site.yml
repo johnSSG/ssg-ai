@@ -7,7 +7,7 @@
     - nvidia
     - docker
     - samba
-    - traefik
+    - docker-stack
     - ai
     - lamp
 

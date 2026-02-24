@@ -1,0 +1,10 @@
+- name: Deploy full docker-compose.yml with Traefik
+  ansible.builtin.copy:
+    dest: /opt/ai-stack/docker-compose.yml
+    mode: '0644'
+    src: docker-compose.yml
+- name: Deploy Dockerfile for custom Apache PHP container
+  ansible.builtin.copy:
+    dest: /opt/ai-stack/lamp/Dockerfile
+    mode: '0644'
+    src: Dockerfile

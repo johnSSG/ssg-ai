@@ -2,7 +2,6 @@
 # === Domains ===
 domain_main: getsimplicity.dev
 domain_ai:   ai.getsimplicity.dev
-domain_api:  api.getsimplicity.dev
 
 # === Let's Encrypt ===
 le_email: tech@simplicity.online
@@ -11,8 +10,4 @@ le_email: tech@simplicity.online
 share_group: samba_share
 samba_www_share_path: /var/www
 samba_fileserver_share_path: /srv/fileserver
-
-# === LAMP ===
-mariadb_root_password: "CHANGE_ME_BEFORE_FIRST_RUN"
-postgres_password: "CHANGE_ME_BEFORE_FIRST_RUN"
 

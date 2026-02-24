@@ -1,0 +1,112 @@
+services:
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/ai-stack/traefik/letsencrypt:/letsencrypt
+    command:
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=tech@simplicity.online
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+    networks:
+      - default
+      - lamp_internal
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - /opt/ai-stack/ollama:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_NO_UPDATE_CHECKS=true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    volumes:
+      - /opt/ai-stack/open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=False
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ai.rule=Host(`ai.getsimplicity.dev`)
+      - traefik.http.routers.ai.entrypoints=websecure
+      - traefik.http.routers.ai.tls.certresolver=letsencrypt
+      - traefik.http.services.ai.loadbalancer.server.port=8080
+
+  lamp-web:
+    build:
+      context: /opt/ai-stack/lamp
+      dockerfile: Dockerfile
+    container_name: lamp-web
+    restart: unless-stopped
+    volumes:
+      - /var/www:/var/www
+      - /opt/ai-stack/lamp/htpasswd:/htpasswd
+      - /opt/ai-stack/lamp/sites-enabled:/etc/apache2/sites-enabled
+      - /opt/ai-stack/lamp/custom-modules.conf:/etc/apache2/conf-enabled/custom-modules.conf:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.lamp.rule=Host(`getsimplicity.dev`)
+      - traefik.http.routers.lamp.entrypoints=websecure
+      - traefik.http.routers.lamp.tls.certresolver=letsencrypt
+      - traefik.http.services.lamp.loadbalancer.server.port=80
+      - traefik.docker.network=lamp_internal
+    networks:
+      - lamp_internal
+
+  lamp-db:
+    image: mariadb:11
+    container_name: lamp-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: "CHANGEME"
+    volumes:
+      - /opt/ai-stack/lamp/db:/var/lib/mysql
+    networks:
+      - lamp_internal
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "CHANGEME"
+    volumes:
+      - /opt/ai-stack/lamp/postgres/data:/var/lib/postgresql/data
+    networks:
+      - lamp_internal
+
+networks:
+  lamp_internal:
+    driver: bridge
